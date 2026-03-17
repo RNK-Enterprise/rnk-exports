@@ -1,0 +1,178 @@
+<div class="rnk-exports-hub">
+  <!-- Header -->
+  <header class="rnk-exports-header">
+    <div class="rnk-exports-header-brand">
+      <h1>{{localize "RNKEXPORTS.HubTitle"}}</h1>
+      <p>{{localize "RNKEXPORTS.HubSubtitle"}}</p>
+    </div>
+  </header>
+
+  <!-- Tab Navigation -->
+  <nav class="rnk-exports-tabs">
+    {{#each tabs}}
+    <button class="rnk-exports-tab-btn {{#if this.active}}active{{/if}}"
+            data-action="change-tab" data-tab="{{this.id}}">
+      <i class="{{this.icon}}"></i>
+      <span>{{this.label}}</span>
+    </button>
+    {{/each}}
+  </nav>
+
+  <!-- Tab Content -->
+  <main class="rnk-exports-content">
+
+    {{!-- ===== EXPORT TAB ===== --}}
+    {{#if (eq activeTab "export")}}
+    <section class="rnk-exports-tab-panel">
+      <div class="rnk-exports-card-grid">
+        <!-- Chat -->
+        <div class="rnk-exports-card">
+          <div class="rnk-exports-card-header">
+            <div class="rnk-exports-card-icon"><i class="fas fa-comments"></i></div>
+            <div class="rnk-exports-card-info">
+              <h3>{{localize "RNKEXPORTS.CardChatTitle"}}</h3>
+              <span class="rnk-exports-card-metric">{{counts.chat}} {{localize "RNKEXPORTS.TabChat"}}</span>
+            </div>
+          </div>
+          <div class="rnk-exports-card-footer">
+            <label class="rnk-exports-split-toggle">
+              <input type="checkbox" data-split="chat" />
+              {{localize "RNKEXPORTS.SplitFilesLabel"}}
+            </label>
+            <button class="rnk-exports-btn rnk-exports-btn-primary" data-action="export-chat">
+              <i class="fas fa-download"></i> {{localize "RNKEXPORTS.ButtonExport"}}
+            </button>
+          </div>
+        </div>
+
+        <!-- Journals -->
+        <div class="rnk-exports-card">
+          <div class="rnk-exports-card-header">
+            <div class="rnk-exports-card-icon"><i class="fas fa-book"></i></div>
+            <div class="rnk-exports-card-info">
+              <h3>{{localize "RNKEXPORTS.CardJournalsTitle"}}</h3>
+              <span class="rnk-exports-card-metric">{{counts.journals}} {{localize "RNKEXPORTS.TabJournals"}}</span>
+            </div>
+          </div>
+          <div class="rnk-exports-card-footer">
+            <label class="rnk-exports-split-toggle">
+              <input type="checkbox" data-split="journals" />
+              {{localize "RNKEXPORTS.SplitFilesLabel"}}
+            </label>
+            <button class="rnk-exports-btn rnk-exports-btn-primary" data-action="export-journals">
+              <i class="fas fa-download"></i> {{localize "RNKEXPORTS.ButtonExport"}}
+            </button>
+          </div>
+        </div>
+
+        <!-- Compendia -->
+        <div class="rnk-exports-card rnk-exports-card-compendia">
+          <div class="rnk-exports-card-header">
+            <div class="rnk-exports-card-icon"><i class="fas fa-vault"></i></div>
+            <div class="rnk-exports-card-info">
+              <h3>{{localize "RNKEXPORTS.CardCompendiaTitle"}}</h3>
+              <span class="rnk-exports-card-metric">{{counts.compendia}} {{localize "RNKEXPORTS.TabCompendia"}}</span>
+            </div>
+          </div>
+          <div class="rnk-exports-pack-list"></div>
+          <div class="rnk-exports-card-footer">
+            <label class="rnk-exports-split-toggle">
+              <input type="checkbox" data-split="compendia" />
+              {{localize "RNKEXPORTS.SplitFilesLabel"}}
+            </label>
+            <button class="rnk-exports-btn rnk-exports-btn-primary" data-action="export-compendia">
+              <i class="fas fa-download"></i> {{localize "RNKEXPORTS.ButtonExport"}}
+            </button>
+          </div>
+        </div>
+
+        <!-- Export All -->
+        <div class="rnk-exports-card rnk-exports-card-bulk">
+          <div class="rnk-exports-card-header">
+            <div class="rnk-exports-card-icon"><i class="fas fa-file-export"></i></div>
+            <div class="rnk-exports-card-info">
+              <h3>{{localize "RNKEXPORTS.ButtonExportAll"}}</h3>
+              <span class="rnk-exports-card-metric">{{localize "RNKEXPORTS.ExportAllDesc"}}</span>
+            </div>
+          </div>
+          <div class="rnk-exports-card-footer">
+            <span></span>
+            <button class="rnk-exports-btn rnk-exports-btn-primary" data-action="export-all">
+              <i class="fas fa-download"></i> {{localize "RNKEXPORTS.ButtonExportAll"}}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+    {{/if}}
+
+    {{!-- ===== IMPORT TAB ===== --}}
+    {{#if (eq activeTab "import")}}
+    <section class="rnk-exports-tab-panel">
+      <div class="rnk-exports-import-panel">
+        <div class="rnk-exports-card rnk-exports-card-import">
+          <div class="rnk-exports-card-header">
+            <div class="rnk-exports-card-icon"><i class="fas fa-file-import"></i></div>
+            <div class="rnk-exports-card-info">
+              <h3>{{localize "RNKEXPORTS.PanelImportTitle"}}</h3>
+              <span class="rnk-exports-card-metric">{{localize "RNKEXPORTS.PanelImportDesc"}}</span>
+            </div>
+          </div>
+          <div class="rnk-exports-import-body">
+            <div class="rnk-exports-file-input-wrapper">
+              <input type="file" accept="application/json" class="rnk-exports-import-file" />
+            </div>
+            <button class="rnk-exports-btn rnk-exports-btn-primary" data-action="import-compendia">
+              <i class="fas fa-upload"></i> {{localize "RNKEXPORTS.ButtonImport"}}
+            </button>
+          </div>
+          <div class="rnk-exports-import-result"></div>
+        </div>
+      </div>
+    </section>
+    {{/if}}
+
+    {{!-- ===== FOLDERS TAB ===== --}}
+    {{#if (eq activeTab "folders")}}
+    <section class="rnk-exports-tab-panel rnk-exports-tab-folders">
+      <div class="rnk-exports-folder-toolbar">
+        <span class="rnk-exports-selected-folder">No folders selected</span>
+        <div class="rnk-exports-folder-toolbar-actions">
+          <button class="rnk-exports-btn rnk-exports-btn-secondary" data-action="refresh-folders">
+            <i class="fas fa-sync"></i>
+          </button>
+        </div>
+      </div>
+      <div class="rnk-exports-folder-tree"></div>
+      <div class="rnk-exports-folder-actions">
+        <button class="rnk-exports-btn rnk-exports-btn-success" data-action="export-folder">
+          <i class="fas fa-download"></i> {{localize "RNKEXPORTS.ButtonExport"}} Selected
+        </button>
+      </div>
+    </section>
+    {{/if}}
+
+    {{!-- ===== SETTINGS TAB ===== --}}
+    {{#if (eq activeTab "settings")}}
+    <section class="rnk-exports-tab-panel">
+      <div class="rnk-exports-settings">
+        <div class="rnk-exports-setting">
+          <label>
+            <input type="checkbox" class="rnk-exports-setting-input" data-setting="enableDebug" />
+            {{localize "RNKEXPORTS.Settings.Debug"}}
+          </label>
+          <div class="rnk-exports-setting-hint">{{localize "RNKEXPORTS.Settings.DebugHint"}}</div>
+        </div>
+        <div class="rnk-exports-setting">
+          <label>
+            {{localize "RNKEXPORTS.Settings.DefaultFolder"}}
+            <input type="text" class="rnk-exports-setting-input" data-setting="defaultExportFolder" />
+          </label>
+          <div class="rnk-exports-setting-hint">{{localize "RNKEXPORTS.Settings.DefaultFolderHint"}}</div>
+        </div>
+      </div>
+    </section>
+    {{/if}}
+
+  </main>
+</div>

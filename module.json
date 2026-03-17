@@ -1,0 +1,33 @@
+{
+  "id": "rnk-exports",
+  "title": "RNK™ Exports",
+  "description": "Export Foundry data (chat, journals, compendia, and file folders) to ZIP bundles for backup and sharing.",
+  "authors": [
+    {
+      "name": "RNK Enterprise",
+      "url": "https://github.com/RNK-Enterprise"
+    }
+  ],
+  "version": "0.0.0",
+  "compatibility": {
+    "minimum": 13,
+    "verified": 13
+  },
+  "url": "https://github.com/RNK-Enterprise/rnk-exports",
+  "manifest": "https://github.com/RNK-Enterprise/rnk-exports/releases/latest/download/module.json",
+  "download": "https://github.com/RNK-Enterprise/rnk-exports/releases/latest/download/module-v0.0.0.zip",
+  "esmodules": [
+    "src/main.js"
+  ],
+  "styles": [
+    "styles/module.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "protected": false
+}

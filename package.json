@@ -1,0 +1,13 @@
+{
+  "name": "rnk-exports",
+  "version": "0.0.0",
+  "description": "Exports Foundry data (chat, journals, compendium packs, and folders) into ZIP archives.",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "echo \"No tests configured\" && exit 0"
+  },
+  "keywords": ["foundry", "exports", "rnk"],
+  "author": "RNK Enterprise",
+  "license": "Proprietary"
+}
