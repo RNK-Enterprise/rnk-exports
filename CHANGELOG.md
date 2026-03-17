@@ -2,6 +2,13 @@
 
 All notable changes to the RNK™ Exports module will be documented in this file.
 
+## [1.0.0] - 2026-03-17
+
+### Free Release - Foundry v13
+
+- Initial public release as a free, standalone module.
+- Includes export system for chat, journals, compendiums, and folders.
+
 ## [0.1.0] - 2026-03-17
 
 ### Development Build - Foundry v13 Compliance & UI Refactor
