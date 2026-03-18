@@ -10,6 +10,13 @@ const safeFileName = (input) => {
 };
 
 export const downloadBlob = (blob, filename) => {
+  // Handling for legacy Edge/IE that requires msSaveOrOpenBlob
+  if (window.navigator && typeof window.navigator.msSaveOrOpenBlob === "function") {
+    window.navigator.msSaveOrOpenBlob(blob, filename);
+    return;
+  }
+
+  // Standard approach: create an anchor and click it to trigger download
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -17,7 +24,9 @@ export const downloadBlob = (blob, filename) => {
   document.body.appendChild(a);
   a.click();
   a.remove();
-  URL.revokeObjectURL(url);
+
+  // Allow the browser to start the download before revoking
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 
 export const buildZip = (entries) => {

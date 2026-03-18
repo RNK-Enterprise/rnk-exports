@@ -102,6 +102,21 @@ export class ExportHubApp extends HandlebarsApplicationMixin(ApplicationV2) {
       });
     }
 
+    // Wire settings inputs
+    this.element.querySelectorAll(".rnk-exports-setting-input[data-setting]").forEach(input => {
+      const setting = input.dataset.setting;
+      const value = game.settings.get("rnk-exports", setting);
+      if (input.type === "checkbox") {
+        input.checked = !!value;
+      } else {
+        input.value = value ?? "";
+      }
+      input.addEventListener("change", async () => {
+        const newValue = input.type === "checkbox" ? input.checked : input.value;
+        await game.settings.set("rnk-exports", setting, newValue);
+      });
+    });
+
     // Wire split toggles on export tab
     this.element.querySelectorAll("[data-split]").forEach(cb => {
       const key = cb.dataset.split;
