@@ -1,5 +1,6 @@
 # RNK Exports
 
+**Version**: 1.0.2  
 **Module**: rnk-exports  
 **Compatibility**: Foundry VTT v13+ (minimum: 13, verified: 13)  
 **License**: RNK Proprietary License
