@@ -24,6 +24,9 @@
     {{!-- ===== EXPORT TAB ===== --}}
     {{#if (eq activeTab "export")}}
     <section class="rnk-exports-tab-panel">
+      <div class="rnk-exports-hint">
+        <p>Note: compendium and folder exports use split-file mode by default, creating one JSON per item for easier manual inspection and individual import.</p>
+      </div>
       <div class="rnk-exports-card-grid">
         <!-- Chat -->
         <div class="rnk-exports-card">
@@ -162,6 +165,13 @@
             {{localize "RNKEXPORTS.Settings.Debug"}}
           </label>
           <div class="rnk-exports-setting-hint">{{localize "RNKEXPORTS.Settings.DebugHint"}}</div>
+        </div>
+        <div class="rnk-exports-setting">
+          <label>
+            <input type="checkbox" class="rnk-exports-setting-input" data-setting="includeReadableText" />
+            {{localize "RNKEXPORTS.Settings.IncludeReadableText"}}
+          </label>
+          <div class="rnk-exports-setting-hint">{{localize "RNKEXPORTS.Settings.IncludeReadableTextHint"}}</div>
         </div>
         <div class="rnk-exports-setting">
           <label>

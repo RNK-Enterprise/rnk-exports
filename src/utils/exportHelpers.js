@@ -1,22 +1,46 @@
-/**
- * Helpers for exporting Foundry data as ZIP archives.
- * RNK™ Exports - 2026
- */
-
 import { ZipBuilder } from "./ZipBuilder.js";
 
 const safeFileName = (input) => {
   return input.replace(/[^a-zA-Z0-9-_\.]/g, "_");
 };
 
+const objectToReadableText = (value, depth = 0) => {
+  const indent = "  ".repeat(depth);
+  if (value === null) return `${indent}null`;
+  if (typeof value !== "object") return `${indent}${value}`;
+  if (Array.isArray(value)) {
+    if (value.length === 0) return `${indent}[]`;
+    let out = `${indent}[\n`;
+    for (const item of value) {
+      out += `${objectToReadableText(item, depth + 1)}\n`;
+    }
+    return out + `${indent}]`;
+  }
+
+  const entries = Object.entries(value);
+  if (!entries.length) return `${indent}{}`;
+  let out = `${indent}{\n`;
+  for (const [key, val] of entries) {
+    if (val !== null && typeof val === "object") {
+      out += `${indent}  ${key}:\n${objectToReadableText(val, depth + 2)}\n`;
+    } else {
+      out += `${indent}  ${key}: ${val}\n`;
+    }
+  }
+  return out + `${indent}` + `}`;
+};
+
+const jsonTextEntry = (basePath, filename, data) => ({
+  path: `${basePath}/${filename}.txt`,
+  content: objectToReadableText(data)
+});
+
 export const downloadBlob = (blob, filename) => {
-  // Handling for legacy Edge/IE that requires msSaveOrOpenBlob
   if (window.navigator && typeof window.navigator.msSaveOrOpenBlob === "function") {
     window.navigator.msSaveOrOpenBlob(blob, filename);
     return;
   }
 
-  // Standard approach: create an anchor and click it to trigger download
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -25,7 +49,6 @@ export const downloadBlob = (blob, filename) => {
   a.click();
   a.remove();
 
-  // Allow the browser to start the download before revoking
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 
@@ -37,7 +60,7 @@ export const buildZip = (entries) => {
   return zip.build();
 };
 
-export const exportChatMessages = async ({ includeAll = true, messageIds = [], splitFiles = false } = {}) => {
+export const exportChatMessages = async ({ includeAll = true, messageIds = [], splitFiles = false, includeReadableText = true } = {}) => {
   const messages = game.messages.contents
     .filter((msg) => (includeAll ? true : messageIds.includes(msg.id)))
     .map((msg) => msg.toObject());
@@ -45,26 +68,22 @@ export const exportChatMessages = async ({ includeAll = true, messageIds = [], s
   const date = new Date().toISOString().replace(/[:.]/g, "-");
   const rootName = `chat-export-${safeFileName(game.world.name || "world")}-${date}`;
 
-  const entries = [
-    {
-      path: `${rootName}/metadata.json`,
-      content: JSON.stringify({ world: game.world.name, exportedAt: new Date().toISOString(), count: messages.length }, null, 2)
-    }
-  ];
+  const entries = [];
 
   if (splitFiles) {
     for (const msg of messages) {
       const id = msg.id || foundry.utils.randomID();
-      entries.push({
-        path: `${rootName}/messages/${safeFileName(id)}.json`,
-        content: JSON.stringify(msg, null, 2)
-      });
+      const jsonPath = `${rootName}/messages/${safeFileName(id)}.json`;
+      entries.push({ path: jsonPath, content: JSON.stringify(msg, null, 2) });
+      if (includeReadableText) {
+        entries.push({ path: `${rootName}/messages/${safeFileName(id)}.txt`, content: objectToReadableText(msg) });
+      }
     }
   } else {
-    entries.push({
-      path: `${rootName}/messages.json`,
-      content: JSON.stringify(messages, null, 2)
-    });
+    entries.push({ path: `${rootName}/messages.json`, content: JSON.stringify(messages, null, 2) });
+    if (includeReadableText) {
+      entries.push({ path: `${rootName}/messages.txt`, content: objectToReadableText(messages) });
+    }
   }
 
   return {
@@ -73,7 +92,7 @@ export const exportChatMessages = async ({ includeAll = true, messageIds = [], s
   };
 };
 
-export const exportJournalEntries = async ({ includeAll = true, entryIds = [], splitFiles = false } = {}) => {
+export const exportJournalEntries = async ({ includeAll = true, entryIds = [], splitFiles = false, includeReadableText = true } = {}) => {
   const entries = game.journal.contents
     .filter((entry) => (includeAll ? true : entryIds.includes(entry.id)))
     .map((entry) => entry.toObject());
@@ -81,26 +100,21 @@ export const exportJournalEntries = async ({ includeAll = true, entryIds = [], s
   const date = new Date().toISOString().replace(/[:.]/g, "-");
   const rootName = `journal-export-${safeFileName(game.world.name || "world")}-${date}`;
 
-  const output = [
-    {
-      path: `${rootName}/metadata.json`,
-      content: JSON.stringify({ world: game.world.name, exportedAt: new Date().toISOString(), count: entries.length }, null, 2)
-    }
-  ];
+  const output = [];
 
   if (splitFiles) {
     for (const entry of entries) {
       const id = entry.id || foundry.utils.randomID();
-      output.push({
-        path: `${rootName}/journals/${safeFileName(id)}.json`,
-        content: JSON.stringify(entry, null, 2)
-      });
+      output.push({ path: `${rootName}/journals/${safeFileName(id)}.json`, content: JSON.stringify(entry, null, 2) });
+      if (includeReadableText) {
+        output.push({ path: `${rootName}/journals/${safeFileName(id)}.txt`, content: objectToReadableText(entry) });
+      }
     }
   } else {
-    output.push({
-      path: `${rootName}/journals.json`,
-      content: JSON.stringify(entries, null, 2)
-    });
+    output.push({ path: `${rootName}/journals.json`, content: JSON.stringify(entries, null, 2) });
+    if (includeReadableText) {
+      output.push({ path: `${rootName}/journals.txt`, content: objectToReadableText(entries) });
+    }
   }
 
   return {
@@ -109,7 +123,7 @@ export const exportJournalEntries = async ({ includeAll = true, entryIds = [], s
   };
 };
 
-export const exportCompendiumPacks = async ({ packIds = [], splitFiles = false } = {}) => {
+export const exportCompendiumPacks = async ({ packIds = [], splitFiles = false, includeReadableText = true } = {}) => {
   const packs = game.packs.filter((p) => (packIds.length ? packIds.includes(p.collection) : true));
   const packsData = [];
 
@@ -132,32 +146,21 @@ export const exportCompendiumPacks = async ({ packIds = [], splitFiles = false }
       for (const doc of contents) {
         const item = doc.toObject();
         const id = item.id || foundry.utils.randomID();
-        entries.push({
-          path: `${rootName}/packs/${safeFileName(pack.collection)}/${safeFileName(id)}.json`,
-          content: JSON.stringify(item, null, 2)
-        });
+        entries.push({ path: `${rootName}/packs/${safeFileName(pack.collection)}/${safeFileName(id)}.json`, content: JSON.stringify(item, null, 2) });
+        if (includeReadableText) {
+          entries.push({ path: `${rootName}/packs/${safeFileName(pack.collection)}/${safeFileName(id)}.txt`, content: objectToReadableText(item) });
+        }
       }
     }
   }
 
-  const metadata = {
-    world: game.world.name,
-    exportedAt: new Date().toISOString(),
-    packCount: packsData.length
-  };
-
-  const outputEntries = [
-    {
-      path: `${rootName}/metadata.json`,
-      content: JSON.stringify(metadata, null, 2)
-    }
-  ];
+  const outputEntries = [];
 
   if (splitFiles) {
-    outputEntries.push({
-      path: `${rootName}/packs.json`,
-      content: JSON.stringify(packsData, null, 2)
-    });
+    outputEntries.push({ path: `${rootName}/packs.json`, content: JSON.stringify(packsData, null, 2) });
+    if (includeReadableText) {
+      outputEntries.push({ path: `${rootName}/packs.txt`, content: objectToReadableText(packsData) });
+    }
     outputEntries.push(...entries);
   } else {
     const packsWithEntries = [];
@@ -170,10 +173,10 @@ export const exportCompendiumPacks = async ({ packIds = [], splitFiles = false }
         entries: contents.map((doc) => doc.toObject())
       });
     }
-    outputEntries.push({
-      path: `${rootName}/packs.json`,
-      content: JSON.stringify(packsWithEntries, null, 2)
-    });
+    outputEntries.push({ path: `${rootName}/packs.json`, content: JSON.stringify(packsWithEntries, null, 2) });
+    if (includeReadableText) {
+      outputEntries.push({ path: `${rootName}/packs.txt`, content: objectToReadableText(packsWithEntries) });
+    }
   }
 
   return {
@@ -182,7 +185,7 @@ export const exportCompendiumPacks = async ({ packIds = [], splitFiles = false }
   };
 };
 
-export const exportDataFolder = async (rootPath) => {
+export const exportDataFolder = async (rootPath, includeReadableText = true) => {
   const normalizePath = (path) => path.replace(/\\/g, "/").replace(/\/\/+/, "/");
   rootPath = normalizePath(rootPath);
 
@@ -193,7 +196,6 @@ export const exportDataFolder = async (rootPath) => {
     if (!result) return;
 
     for (const file of result.files) {
-      // Only include JSON for now
       if (file.endsWith(".json")) {
         const response = await fetch(file);
         const data = await response.text();
@@ -212,13 +214,25 @@ export const exportDataFolder = async (rootPath) => {
   const date = new Date().toISOString().replace(/[:.]/g, "-");
   const rootName = `data-export-${safeFileName(rootPath)}-${date}`;
 
-  const entries = [
-    {
-      path: `${rootName}/metadata.json`,
-      content: JSON.stringify({ root: rootPath, exportedAt: new Date().toISOString(), fileCount: folderEntries.length }, null, 2)
-    },
-    ...folderEntries.map((entry) => ({ path: `${rootName}/${entry.path}`, content: entry.content }))
-  ];
+  const entries = [];
+
+  if (includeReadableText) {
+    entries.push({
+      path: `${rootName}/data-folder-summary.txt`,
+      content: objectToReadableText({ root: rootPath, exportedAt: new Date().toISOString(), fileCount: folderEntries.length })
+    });
+  }
+
+  for (const entry of folderEntries) {
+    entries.push({ path: `${rootName}/${entry.path}`, content: entry.content });
+    if (!includeReadableText) continue;
+    try {
+      const parsed = JSON.parse(entry.content);
+      entries.push({ path: `${rootName}/${entry.path.replace(/\.json$/, ".txt")}`, content: objectToReadableText(parsed) });
+    } catch {
+      entries.push({ path: `${rootName}/${entry.path.replace(/\.json$/, ".txt")}`, content: entry.content });
+    }
+  }
 
   return {
     blob: buildZip(entries),
@@ -226,13 +240,6 @@ export const exportDataFolder = async (rootPath) => {
   };
 };
 
-/**
- * Import a strict JSON file into Foundry documents.
- *
- * Expected JSON format:
- * - Array of objects [{type:"Item", folder:"MyFolder/Sub", data:{...}}]
- * - OR { entries:[...]} or { docs:[...] }
- */
 export const importJsonDocuments = async (rawText) => {
   const json = JSON.parse(rawText);
 
@@ -244,7 +251,6 @@ export const importJsonDocuments = async (rawText) => {
   } else if (Array.isArray(json.docs)) {
     entries = json.docs;
   } else if (typeof json === "object" && json !== null && json.name) {
-    // Single document (e.g. native Foundry actor/item export)
     entries = [json];
   } else {
     entries = [];
@@ -256,12 +262,10 @@ export const importJsonDocuments = async (rawText) => {
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
 
-    // Detect our wrapper format: { folder, type, data: {name, ...} }
     const isWrapped = entry.data && typeof entry.data === "object" && entry.data.name;
     const docData = isWrapped ? foundry.utils.deepClone(entry.data) : foundry.utils.deepClone(entry);
     const typeHint = isWrapped ? entry.type : null;
 
-    // Resolve the document class
     const resolvedType = _resolveDocumentType(typeHint, docData);
     console.log(`[RNK Exports] Entry ${i}: wrapped=${isWrapped}, typeHint=${typeHint}, resolved=${resolvedType}, name=${docData.name}`);
 
@@ -270,20 +274,23 @@ export const importJsonDocuments = async (rawText) => {
       continue;
     }
 
-    // Strip old IDs
     delete docData._id;
 
-    // Set folder
     try {
-      const folderName = (isWrapped ? entry.folder : null) || entry.folderPath || "RNK Exports";
-      const folderId = await _ensureFolder(resolvedType, folderName);
-      docData.folder = folderId;
+      const folderName = (isWrapped ? entry.folder : null) || entry.folderPath || null;
+      if (folderName) {
+        const folderId = await _ensureFolder(resolvedType, folderName);
+        if (folderId) {
+          docData.folder = folderId;
+        }
+      } else {
+        delete docData.folder;
+      }
     } catch (err) {
       console.error(`[RNK Exports] Failed to create folder for entry ${i}:`, err);
       delete docData.folder;
     }
 
-    // Create document
     try {
       const cls = CONFIG[resolvedType]?.documentClass;
       if (!cls) {
@@ -303,17 +310,12 @@ export const importJsonDocuments = async (rawText) => {
   return created;
 };
 
-/**
- * Resolve the Foundry document class name from type string or data shape.
- */
 const _resolveDocumentType = (type, data) => {
-  // Known document class names
   const knownTypes = ["Actor", "Item", "JournalEntry", "RollTable", "Macro",
     "Playlist", "Scene", "Cards", "Adventure", "ChatMessage"];
 
   if (type && knownTypes.includes(type)) return type;
 
-  // Infer from data shape
   if (data.prototypeToken !== undefined || data.items !== undefined) return "Actor";
   if (data.pages !== undefined) return "JournalEntry";
   if (data.results !== undefined) return "RollTable";
@@ -322,23 +324,25 @@ const _resolveDocumentType = (type, data) => {
   if (data.cards !== undefined) return "Cards";
   if (data.walls !== undefined || data.tokens !== undefined) return "Scene";
 
-  // Items have system data + a sub-type like "weapon", "spell", etc.
   if (data.system !== undefined) return "Item";
 
   return null;
 };
 
 const _ensureFolder = async (type, path) => {
-  const segments = path.split("/").filter(Boolean);
-  const rootName = "RNK Exports";
-  const rootFolder = await _ensureFolderNode(type, rootName, null);
+  if (!path || typeof path !== "string") return null;
+  const normalizedPath = path.replace(/\\/g, "/").replace(/^\/|\/$/g, "");
+  const segments = normalizedPath.split("/").filter(Boolean);
+  if (!segments.length) return null;
 
-  let parent = rootFolder;
+  let parentId = null;
+  let node = null;
   for (const segment of segments) {
-    parent = await _ensureFolderNode(type, segment, parent.id);
+    node = await _ensureFolderNode(type, segment, parentId);
+    parentId = node.id;
   }
 
-  return parent.id;
+  return node?.id || null;
 };
 
 const _ensureFolderNode = async (type, name, parentId) => {

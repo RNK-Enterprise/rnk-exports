@@ -1,16 +1,6 @@
-/**
- * RNK™ Exports
- * @copyright 2026 RNK Enterprise
- * @license RNK Proprietary License
- *
- * This module provides tools to export Foundry data (chat, journals, compendia,
- * and file system folders) into ZIP archives for backup and sharing.
- */
-
 import { ExportHubApp } from "./apps/ExportHubApp.js";
 
 Hooks.on("getSceneControlButtons", (controls) => {
-  console.log("[RNK Exports] getSceneControlButtons hook fired");
   const toolId = "rnk-exports-open";
   const tool = {
     name: toolId,
@@ -19,13 +9,9 @@ Hooks.on("getSceneControlButtons", (controls) => {
     button: true,
     toggle: false,
     onChange: (active) => {
-      console.log(`[RNK Exports] Button clicked! Active: ${active}`);
       if (!active) return;
-      console.log("[RNK Exports] Creating and rendering app...");
       const app = new ExportHubApp();
-      console.log("[RNK Exports] App instance created:", app);
       app.render(true);
-      console.log("[RNK Exports] App rendered");
     }
   };
 
@@ -47,7 +33,6 @@ Hooks.on("getSceneControlButtons", (controls) => {
 });
 
 Hooks.once("init", () => {
-  console.log("[RNK Exports] Initializing");
 });
 
 Hooks.once("ready", () => {
@@ -67,5 +52,14 @@ Hooks.once("ready", () => {
     config: true,
     default: "data/",
     type: String
+  });
+
+  game.settings.register("rnk-exports", "includeReadableText", {
+    name: "RNKEXPORTS.Settings.IncludeReadableText",
+    hint: "RNKEXPORTS.Settings.IncludeReadableTextHint",
+    scope: "client",
+    config: true,
+    default: true,
+    type: Boolean
   });
 });

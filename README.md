@@ -12,8 +12,11 @@ RNK Exports provides a comprehensive system for exporting Foundry VTT data into 
 
 - Export chat messages and conversation history to plaintext or JSON
 - Export journal entries and pages with formatting preserved
-- Export compendium pack contents (actors, items, journals, macros)
-- Export world data folders and subfolders with recursion
+- Export compendium pack contents (actors, items, journals, macros) as JSON payloads
+- By default, compendium export splits each entry into an individual JSON file (per-item file export)
+- Supports one JSON per item for Martian style export, matching manual per-item export behavior
+- Export world data folders and subfolders with recursion as JSON files
+- JSON output includes document data; metadata files are removed to keep exports clean, and readable .txt companion files are optional via settings
 - Multi-folder selection with checkbox-based UI
 - Foundry v13 ApplicationV2 architecture
 - Crimson Blood Gothic theme with responsive design
@@ -56,12 +59,25 @@ rnk-exports/
 4. Choose specific folders (if exporting folder data)
 5. Click export button to download ZIP archive
 
+## Screenshots
+
+Below are the current module panel screenshots:
+
+### RNK Exports Screenshot 1
+![RNK Exports Screenshot 1](./rnk-exports-1.png)
+
+### RNK Exports Screenshot 2
+![RNK Exports Screenshot 2](./rnk-exports-2.png)
+
+### RNK Exports Screenshot 3
+![RNK Exports Screenshot 3](./rnk-exports-3.png)
+
 ## Export Types
 
-- **Chat Export**: Saves all chat messages with metadata
-- **Journal Export**: Copies all journal entries and pages
-- **Compendium Export**: Extracts pack contents to JSON
-- **Folder Export**: Exports directory structure and files
+- **Chat Export**: Saves all chat messages as JSON and companion human-readable .txt
+- **Journal Export**: Copies all journal entries as JSON and companion human-readable .txt
+- **Compendium Export**: Extracts pack contents to JSON and companion human-readable .txt
+- **Folder Export**: Exports directory structure JSON files and companion human-readable .txt copies (no separate metadata file)
 
 ## Technical Details
 

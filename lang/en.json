@@ -28,6 +28,8 @@
   "RNKEXPORTS.Settings.DebugHint": "Enable debug console output for export operations.",
   "RNKEXPORTS.Settings.DefaultFolder": "Default export folder",
   "RNKEXPORTS.Settings.DefaultFolderHint": "Path to use when browsing folders (data/ by default).",
+  "RNKEXPORTS.Settings.IncludeReadableText": "Include human-readable .txt companion files",
+  "RNKEXPORTS.Settings.IncludeReadableTextHint": "When enabled, exports add a .txt version of JSON exports for easier viewing.",
   "RNKEXPORTS.Notifications.ExportComplete": "Export complete. Download should start automatically.",
   "RNKEXPORTS.Notifications.FolderSelected": "Selected folder: {path}",
   "RNKEXPORTS.Notifications.FolderSelectionRequired": "Please select a folder before exporting.",
@@ -44,7 +46,7 @@
   "RNKEXPORTS.CardJournalsTitle": "Journal Entries",
   "RNKEXPORTS.CardCompendiaTitle": "Compendium Packs",
   "RNKEXPORTS.CardFoldersTitle": "Data Folders",
-  "RNKEXPORTS.SplitFilesLabel": "Split files",
+  "RNKEXPORTS.SplitFilesLabel": "Split files (one JSON per entry / item)",
   "RNKEXPORTS.ExportAllDesc": "Export chat, journals, and compendia in one operation",
 
   "RNKEXPORTS.PanelExportTitle": "Export Data",
