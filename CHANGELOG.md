@@ -2,6 +2,14 @@
 
 All notable changes to the RNK™ Exports module will be documented in this file.
 
+## [1.0.2] - 2026-03-19
+
+### Patch Release
+
+- Cleaned code comments and removed unnecessary header comments.
+- Version bump and release assets regeneration to v1.0.2.
+- Ensured screenshots are restored in README and pushed.
+
 ## [1.0.0] - 2026-03-17
 
 ### Free Release - Foundry v13
