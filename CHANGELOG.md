@@ -4,6 +4,14 @@ All notable changes to RNK™ Exports are documented here.
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-03-31
+
+### Release Correction
+
+- Corrected the free-module manifest so `protected` remains set to `false`.
+- Updated the local validation rule to require the free-tier manifest flag.
+- Rebuilt the published release assets for the corrected free-module manifest.
+
 ## [1.0.3] - 2026-03-31
 
 ### Clean Up

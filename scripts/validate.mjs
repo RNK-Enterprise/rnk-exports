@@ -68,8 +68,8 @@ if (moduleJson.version !== packageJson.version) {
   fail(`Version mismatch: module.json=${moduleJson.version} package.json=${packageJson.version}`);
 }
 
-if (moduleJson.protected !== true) {
-  fail("module.json must set protected to true for this RNK module.");
+if (moduleJson.protected !== false) {
+  fail("module.json must set protected to false for this free RNK module.");
 }
 
 for (const relativePath of filesToCheck) {

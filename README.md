@@ -1,6 +1,6 @@
 # RNK™ Exports
 
-**Version**: 1.0.3  
+**Version**: 1.0.4  
 **Module ID**: `rnk-exports`  
 **Release Tier**: Free  
 **Compatibility**: Foundry VTT v13+ (minimum: 13, verified: 13)  
