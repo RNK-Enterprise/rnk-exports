@@ -1,11 +1,11 @@
 {
   "name": "rnk-exports",
-  "version": "1.0.2",
-  "description": "Exports Foundry data (chat, journals, compendium packs, and folders) into ZIP archives.",
+  "version": "1.0.3",
+  "description": "Export and restore Foundry chat, journals, compendia, and selected world folders with RNK™ Exports ZIP bundles.",
   "type": "module",
   "main": "src/main.js",
   "scripts": {
-    "test": "echo \"No tests configured\" && exit 0"
+    "test": "node ./scripts/validate.mjs"
   },
   "keywords": ["foundry", "exports", "rnk"],
   "author": "RNK Enterprise",

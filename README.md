@@ -1,124 +1,124 @@
-# RNK Exports
+# RNK™ Exports
 
-**Version**: 1.0.2  
-**Module**: rnk-exports  
+**Version**: 1.0.3  
+**Module ID**: `rnk-exports`  
+**Release Tier**: Free  
 **Compatibility**: Foundry VTT v13+ (minimum: 13, verified: 13)  
 **License**: RNK Proprietary License
 
 ## Purpose
 
-RNK Exports provides a comprehensive system for exporting Foundry VTT data into portable ZIP archives for backups, sharing, and migration. Users can selectively export chat history, journals, compendium contents, and file folders with a user-friendly interface.
+RNK™ Exports is a standalone Foundry VTT export hub for packaging world data into portable ZIP bundles. It handles chat logs, journal entries, selected compendium packs, and selected world-document folders, and it can restore RNK™ Exports JSON and ZIP bundles back into the current world.
 
 ## Features
 
-- Export chat messages and conversation history to plaintext or JSON
-- Export journal entries and pages with formatting preserved
-- Export compendium pack contents (actors, items, journals, macros) as JSON payloads
-- By default, compendium export splits each entry into an individual JSON file (per-item file export)
-- Supports one JSON per item for Martian style export, matching manual per-item export behavior
-- Export world data folders and subfolders with recursion as JSON files
-- JSON output includes document data; metadata files are removed to keep exports clean, and readable .txt companion files are optional via settings
-- Multi-folder selection with checkbox-based UI
-- Foundry v13 ApplicationV2 architecture
-- Crimson Blood Gothic theme with responsive design
-- Event delegation architecture for efficient event handling
+- Export chat messages as combined or split JSON bundles
+- Export journal entries with optional human-readable `.txt` companion files
+- Export selected compendium packs as combined or split bundles
+- Export selected world-document folders while preserving nested folder paths
+- Restore RNK™ Exports `.json` and `.zip` bundles into world documents
+- Create one combined export bundle from the Export tab
+- Restrict access to GMs through a Foundry VTT v13 `ApplicationV2` interface
 
 ## Module Structure
 
-```
+```text
 rnk-exports/
-├── module.json          # Manifest file
-├── package.json         # NPM package metadata
-├── CHANGELOG.md         # Version history
-├── README.md            # This file
-├── LICENSE              # RNK Proprietary License
+├── module.json                 # Foundry manifest
+├── package.json                # Local validation metadata
+├── CHANGELOG.md                # Version history
+├── README.md                   # Module documentation
+├── LICENSE                     # RNK Proprietary License
+├── lang/
+│   └── en.json                 # English localization
+├── scripts/
+│   └── validate.mjs            # Local validation script
 ├── src/
-│   ├── main.js          # Module initialization
+│   ├── main.js                 # Module initialization and scene control registration
 │   ├── apps/
-│   │   └── ExportHubApp.js   # UI application (ApplicationV2)
+│   │   └── ExportHubApp.js     # Main ApplicationV2 export hub
 │   └── utils/
-│       └── exportHelpers.js  # Export utility functions
-├── templates/
-│   └── export-hub.hbs   # Main UI template
+│       ├── exportHelpers.js    # Export bundle builders
+│       ├── importHelpers.js    # Import and restore helpers
+│       └── ZipBuilder.js       # Store-only ZIP reader and writer
 ├── styles/
-│   └── module.css       # Complete theme styling
-└── lang/
-    └── en.json          # English localization
+│   ├── module.css              # Shared module theme
+│   ├── import.css              # Import panel styling
+│   └── panels.css              # Folder and settings panel styling
+└── templates/
+    └── export-hub.hbs          # Main hub template
 ```
 
 ## Installation
 
-1. Copy the module folder to your Foundry VTT `modules` directory
-2. Enable the module in your world settings
-3. Grant admin/GM permissions for access to export features
+1. Copy the module folder into your Foundry VTT `Data/modules` directory.
+2. Enable `RNK™ Exports` in the world module list.
+3. Open the scene controls as a GM and launch the export hub.
 
 ## Usage
 
-1. Open the RNK Exports hub from the scene controls toolbar
-2. Select from available export options on the Dashboard panel
-3. Configure export settings if desired
-4. Choose specific folders (if exporting folder data)
-5. Click export button to download ZIP archive
-
-## Screenshots
-
-Below are the current module panel screenshots:
-
-### RNK Exports Screenshot 1
-![RNK Exports Screenshot 1](./rnk-exports-1.png)
-
-### RNK Exports Screenshot 2
-![RNK Exports Screenshot 2](./rnk-exports-2.png)
-
-### RNK Exports Screenshot 3
-![RNK Exports Screenshot 3](./rnk-exports-3.png)
+1. Open the `RNK™ Exports` hub from the scene controls toolbar.
+2. Choose the export type you want on the Export tab.
+3. Select specific compendium packs before running a compendium export.
+4. Select world folders on the World Folders tab before running a folder export.
+5. Use the Import tab to restore an RNK™ Exports `.json` or `.zip` bundle into world documents.
 
 ## Export Types
 
-- **Chat Export**: Saves all chat messages as JSON and companion human-readable .txt
-- **Journal Export**: Copies all journal entries as JSON and companion human-readable .txt
-- **Compendium Export**: Extracts pack contents to JSON and companion human-readable .txt
-- **Folder Export**: Exports directory structure JSON files and companion human-readable .txt copies (no separate metadata file)
+- **Chat Export**: Saves chat messages as combined or split JSON bundles with optional `.txt` companion files.
+- **Journal Export**: Saves journal entries as combined or split JSON bundles with optional `.txt` companion files.
+- **Compendium Export**: Saves selected pack contents as JSON bundles; split mode writes one JSON file per document.
+- **World Folder Export**: Saves selected Foundry world-document folders and their nested folder paths as document bundles.
+- **Export Everything**: Creates one ZIP bundle containing chat, journals, selected compendia, and any selected world folders.
+
+## Import and Restore
+
+- RNK™ Exports JSON and ZIP bundles can be restored from the Import tab.
+- Imported content is created as world documents in the current world.
+- Restored compendium bundle content is grouped as world documents and does not recreate compendium packs.
+
+## Screenshots
+
+### RNK™ Exports Screenshot 1
+
+![RNK™ Exports Screenshot 1](./rnk-exports-1.png)
+
+### RNK™ Exports Screenshot 2
+
+![RNK™ Exports Screenshot 2](./rnk-exports-2.png)
+
+### RNK™ Exports Screenshot 3
+
+![RNK™ Exports Screenshot 3](./rnk-exports-3.png)
 
 ## Technical Details
 
-- **Framework**: Foundry VTT v13 ApplicationV2
-- **Architecture**: Event delegation with centralized handler
-- **Styling**: CSS variables with responsive media queries
-- **API Compliance**: v13 FilePicker with proper lifecycle management
+- **Framework**: Foundry VTT v13 `ApplicationV2`
+- **Architecture**: Standalone export hub with separate export, import, and ZIP helper modules
+- **Styling**: Split stylesheet layout to keep tracked files under the RNK 500-line limit
+- **Validation**: `npm test` validates manifest JSON, version parity, protected flag, required files, line caps, blocked wording, and emoji characters
 
 ## Known Limitations
 
-- Folder export limited to `/worlds` directory structure
-- Individual folder exports create separate ZIPs (batch mode planned)
-- Theme optimized for dark mode environments
-- Large exports may require extended processing time
+- Restored compendium bundles create world documents instead of rebuilding compendium packs.
+- Large exports can take longer depending on world size and browser memory limits.
+- The theme is tuned for dark Foundry layouts.
 
-## Future Versions
+## My Story
 
-### v0.2.0
-- Batch ZIP creation (single download for multiple folders)
-- Import/restore from exported bundles
-- Progress indicators for large exports
-
-### v0.3.0
-- Custom filtering (date range, entity type)
-- Export templates and presets
-- External backup service integration
-
-### v1.0.0
-- Public release with full feature parity
-- Comprehensive API documentation
+RNK Enterprise is built by The Curator, a retired truck driver, self-taught coder, and stroke survivor who keeps building tools for Foundry VTT the hard way: with persistence, grit, and a refusal to quit.
 
 ## License
 
-RNK Proprietary License. See LICENSE file for details.
+RNK Proprietary License. See `LICENSE` for details.
 
 ## Support
 
-For issues, questions, or contributions, contact RNK Enterprise.
+For issues, questions, or support, contact RNK Enterprise.
+
+Patreon: [RNK Enterprises Patreon](https://patreon.com/RagNaroks?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink)
 
 ---
 
 **Author**: RNK Enterprise  
-**Last Updated**: March 17, 2026
+**Last Updated**: March 31, 2026

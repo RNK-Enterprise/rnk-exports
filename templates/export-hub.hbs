@@ -25,7 +25,7 @@
     {{#if (eq activeTab "export")}}
     <section class="rnk-exports-tab-panel">
       <div class="rnk-exports-hint">
-        <p>Note: compendium and folder exports use split-file mode by default, creating one JSON per item for easier manual inspection and individual import.</p>
+        <p>{{localize "RNKEXPORTS.ExportHint"}}</p>
       </div>
       <div class="rnk-exports-card-grid">
         <!-- Chat -->
@@ -123,9 +123,9 @@
           </div>
           <div class="rnk-exports-import-body">
             <div class="rnk-exports-file-input-wrapper">
-              <input type="file" accept="application/json" class="rnk-exports-import-file" />
+              <input type="file" accept=".json,.zip,application/json,application/zip" class="rnk-exports-import-file" />
             </div>
-            <button class="rnk-exports-btn rnk-exports-btn-primary" data-action="import-compendia">
+            <button class="rnk-exports-btn rnk-exports-btn-primary" data-action="import-documents">
               <i class="fas fa-upload"></i> {{localize "RNKEXPORTS.ButtonImport"}}
             </button>
           </div>
@@ -139,7 +139,7 @@
     {{#if (eq activeTab "folders")}}
     <section class="rnk-exports-tab-panel rnk-exports-tab-folders">
       <div class="rnk-exports-folder-toolbar">
-        <span class="rnk-exports-selected-folder">No folders selected</span>
+        <span class="rnk-exports-selected-folder">{{localize "RNKEXPORTS.Folders.NoneSelected"}}</span>
         <div class="rnk-exports-folder-toolbar-actions">
           <button class="rnk-exports-btn rnk-exports-btn-secondary" data-action="refresh-folders">
             <i class="fas fa-sync"></i>
@@ -149,7 +149,7 @@
       <div class="rnk-exports-folder-tree"></div>
       <div class="rnk-exports-folder-actions">
         <button class="rnk-exports-btn rnk-exports-btn-success" data-action="export-folder">
-          <i class="fas fa-download"></i> {{localize "RNKEXPORTS.ButtonExport"}} Selected
+          <i class="fas fa-download"></i> {{localize "RNKEXPORTS.ButtonExportSelectedFolders"}}
         </button>
       </div>
     </section>
@@ -172,13 +172,6 @@
             {{localize "RNKEXPORTS.Settings.IncludeReadableText"}}
           </label>
           <div class="rnk-exports-setting-hint">{{localize "RNKEXPORTS.Settings.IncludeReadableTextHint"}}</div>
-        </div>
-        <div class="rnk-exports-setting">
-          <label>
-            {{localize "RNKEXPORTS.Settings.DefaultFolder"}}
-            <input type="text" class="rnk-exports-setting-input" data-setting="defaultExportFolder" />
-          </label>
-          <div class="rnk-exports-setting-hint">{{localize "RNKEXPORTS.Settings.DefaultFolderHint"}}</div>
         </div>
       </div>
     </section>

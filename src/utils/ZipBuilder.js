@@ -1,5 +1,10 @@
 
 const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
+
+const ZIP_LOCAL_FILE_HEADER = 0x04034b50;
+const ZIP_CENTRAL_DIRECTORY_HEADER = 0x02014b50;
+const ZIP_END_OF_CENTRAL_DIRECTORY = 0x06054b50;
 
 function crc32(buf) {
   let crc = -1;
@@ -36,6 +41,53 @@ function makeNumberLE(value, size) {
     v = v >>> 8;
   }
   return out;
+}
+
+function readNumberLE(buffer, offset, size) {
+  let value = 0;
+  for (let i = 0; i < size; i++) {
+    value |= buffer[offset + i] << (8 * i);
+  }
+  return value >>> 0;
+}
+
+export function readZipEntries(input) {
+  const buffer = input instanceof Uint8Array ? input : new Uint8Array(input);
+  const entries = [];
+  let offset = 0;
+
+  while (offset + 4 <= buffer.length) {
+    const signature = readNumberLE(buffer, offset, 4);
+
+    if (signature === ZIP_LOCAL_FILE_HEADER) {
+      const compressionMethod = readNumberLE(buffer, offset + 8, 2);
+      const compressedSize = readNumberLE(buffer, offset + 18, 4);
+      const fileNameLength = readNumberLE(buffer, offset + 26, 2);
+      const extraFieldLength = readNumberLE(buffer, offset + 28, 2);
+
+      if (compressionMethod !== 0) {
+        throw new Error(`Unsupported ZIP compression method: ${compressionMethod}`);
+      }
+
+      const nameStart = offset + 30;
+      const nameEnd = nameStart + fileNameLength;
+      const dataStart = nameEnd + extraFieldLength;
+      const dataEnd = dataStart + compressedSize;
+      const path = textDecoder.decode(buffer.slice(nameStart, nameEnd));
+
+      entries.push({ path, data: buffer.slice(dataStart, dataEnd) });
+      offset = dataEnd;
+      continue;
+    }
+
+    if (signature === ZIP_CENTRAL_DIRECTORY_HEADER || signature === ZIP_END_OF_CENTRAL_DIRECTORY) {
+      break;
+    }
+
+    offset += 1;
+  }
+
+  return entries;
 }
 
 export class ZipBuilder {

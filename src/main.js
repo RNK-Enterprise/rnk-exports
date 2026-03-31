@@ -1,10 +1,33 @@
 import { ExportHubApp } from "./apps/ExportHubApp.js";
 
+const MODULE_ID = "rnk-exports";
+const MODULE_TITLE = "RNK™ Exports";
+
+const registerSettings = () => {
+  game.settings.register(MODULE_ID, "enableDebug", {
+    name: "RNKEXPORTS.Settings.Debug",
+    hint: "RNKEXPORTS.Settings.DebugHint",
+    scope: "client",
+    config: true,
+    default: false,
+    type: Boolean
+  });
+
+  game.settings.register(MODULE_ID, "includeReadableText", {
+    name: "RNKEXPORTS.Settings.IncludeReadableText",
+    hint: "RNKEXPORTS.Settings.IncludeReadableTextHint",
+    scope: "client",
+    config: true,
+    default: true,
+    type: Boolean
+  });
+};
+
 Hooks.on("getSceneControlButtons", (controls) => {
   const toolId = "rnk-exports-open";
   const tool = {
     name: toolId,
-    title: "RNK Exports",
+    title: MODULE_TITLE,
     icon: "fas fa-file-archive",
     button: true,
     toggle: false,
@@ -17,7 +40,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 
   const control = {
     name: "rnk-exports",
-    title: "RNK Exports",
+    title: MODULE_TITLE,
     icon: "fas fa-file-archive",
     order: 99,
     layer: "tokens",
@@ -33,33 +56,5 @@ Hooks.on("getSceneControlButtons", (controls) => {
 });
 
 Hooks.once("init", () => {
-});
-
-Hooks.once("ready", () => {
-  game.settings.register("rnk-exports", "enableDebug", {
-    name: "RNKEXPORTS.Settings.Debug",
-    hint: "RNKEXPORTS.Settings.DebugHint",
-    scope: "client",
-    config: true,
-    default: false,
-    type: Boolean
-  });
-
-  game.settings.register("rnk-exports", "defaultExportFolder", {
-    name: "RNKEXPORTS.Settings.DefaultFolder",
-    hint: "RNKEXPORTS.Settings.DefaultFolderHint",
-    scope: "client",
-    config: true,
-    default: "data/",
-    type: String
-  });
-
-  game.settings.register("rnk-exports", "includeReadableText", {
-    name: "RNKEXPORTS.Settings.IncludeReadableText",
-    hint: "RNKEXPORTS.Settings.IncludeReadableTextHint",
-    scope: "client",
-    config: true,
-    default: true,
-    type: Boolean
-  });
+  registerSettings();
 });

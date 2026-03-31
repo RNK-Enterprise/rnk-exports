@@ -3,9 +3,17 @@ import {
   exportChatMessages,
   exportJournalEntries,
   exportCompendiumPacks,
+  exportAllData,
+  exportWorldFolders,
   downloadBlob,
-  importJsonDocuments
+  importExportFile
 } from "../utils/exportHelpers.js";
+
+const MODULE_ID = "rnk-exports";
+const MODULE_LABEL = "[RNK™ Exports]";
+
+const localize = (key) => game.i18n.localize(key);
+const format = (key, data) => game.i18n.format(key, data);
 
 export class ExportHubApp extends HandlebarsApplicationMixin(ApplicationV2) {
   static DEFAULT_OPTIONS = {
@@ -19,9 +27,8 @@ export class ExportHubApp extends HandlebarsApplicationMixin(ApplicationV2) {
       "export-journals": ExportHubApp._onExportJournals,
       "export-compendia": ExportHubApp._onExportCompendia,
       "export-all": ExportHubApp._onExportAll,
-      "import-compendia": ExportHubApp._onImportCompendia,
+      "import-documents": ExportHubApp._onImportDocuments,
       "refresh-folders": ExportHubApp._onRefreshFolders,
-      "browse-folders": ExportHubApp._onBrowseFolders,
       "export-folder": ExportHubApp._onExportFolder
     }
   };
@@ -66,9 +73,8 @@ export class ExportHubApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
     context.isGM = game.user.isGM;
     context.settings = {
-      debug: game.settings.get("rnk-exports", "enableDebug"),
-      defaultFolder: game.settings.get("rnk-exports", "defaultExportFolder"),
-      includeReadableText: game.settings.get("rnk-exports", "includeReadableText")
+      debug: game.settings.get(MODULE_ID, "enableDebug"),
+      includeReadableText: game.settings.get(MODULE_ID, "includeReadableText")
     };
     context.world = {
       name: game.world?.name || "",
@@ -150,16 +156,12 @@ export class ExportHubApp extends HandlebarsApplicationMixin(ApplicationV2) {
     this.render(false, { force: true });
   }
 
-  static async _onImportCompendia(event, target) {
-    await this._importCompendia();
+  static async _onImportDocuments(event, target) {
+    await this._importDocuments();
   }
 
   static async _onRefreshFolders(event, target) {
     this._selectedFolders.clear();
-    await this._renderFolderTree(this._getHtml());
-  }
-
-  static async _onBrowseFolders(event, target) {
     await this._renderFolderTree(this._getHtml());
   }
 
@@ -169,150 +171,106 @@ export class ExportHubApp extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   async _exportChat(splitFiles = false) {
-    ui.notifications.info(game.i18n.localize("RNKEXPORTS.Notifications.ExportingChat"));
+    ui.notifications.info(localize("RNKEXPORTS.Notifications.ExportingChat"));
     try {
-      const includeReadableText = game.settings.get("rnk-exports", "includeReadableText");
+      const includeReadableText = game.settings.get(MODULE_ID, "includeReadableText");
       const { blob, filename } = await exportChatMessages({ splitFiles, includeReadableText });
       downloadBlob(blob, filename);
-      ui.notifications.info(game.i18n.localize("RNKEXPORTS.Notifications.ExportComplete"));
+      ui.notifications.info(localize("RNKEXPORTS.Notifications.ExportComplete"));
     } catch (err) {
-      console.error("[RNK Exports] Export chat error:", err);
-      ui.notifications.error(game.i18n.localize("RNKEXPORTS.Notifications.ExportFailed"));
+      console.error(`${MODULE_LABEL} Export chat error:`, err);
+      ui.notifications.error(localize("RNKEXPORTS.Notifications.ExportFailed"));
     }
   }
 
   async _exportJournals(splitFiles = false) {
-    ui.notifications.info(game.i18n.localize("RNKEXPORTS.Notifications.ExportingJournals"));
+    ui.notifications.info(localize("RNKEXPORTS.Notifications.ExportingJournals"));
     try {
-      const includeReadableText = game.settings.get("rnk-exports", "includeReadableText");
+      const includeReadableText = game.settings.get(MODULE_ID, "includeReadableText");
       const { blob, filename } = await exportJournalEntries({ splitFiles, includeReadableText });
       downloadBlob(blob, filename);
-      ui.notifications.info(game.i18n.localize("RNKEXPORTS.Notifications.ExportComplete"));
+      ui.notifications.info(localize("RNKEXPORTS.Notifications.ExportComplete"));
     } catch (err) {
-      console.error("[RNK Exports] Export journals error:", err);
-      ui.notifications.error(game.i18n.localize("RNKEXPORTS.Notifications.ExportFailed"));
+      console.error(`${MODULE_LABEL} Export journals error:`, err);
+      ui.notifications.error(localize("RNKEXPORTS.Notifications.ExportFailed"));
     }
   }
 
   async _exportCompendia(splitFiles = false) {
     const packIds = Array.from(this._selectedPacks);
     if (packIds.length === 0) {
-      ui.notifications.warn("Select at least one compendium pack to export.");
+      ui.notifications.warn(localize("RNKEXPORTS.Notifications.PackSelectionRequired"));
       return;
     }
-    ui.notifications.info(game.i18n.localize("RNKEXPORTS.Notifications.ExportingCompendia"));
+    ui.notifications.info(localize("RNKEXPORTS.Notifications.ExportingCompendia"));
     try {
-      const includeReadableText = game.settings.get("rnk-exports", "includeReadableText");
+      const includeReadableText = game.settings.get(MODULE_ID, "includeReadableText");
       const { blob, filename } = await exportCompendiumPacks({ packIds, splitFiles, includeReadableText });
       downloadBlob(blob, filename);
-      ui.notifications.info(game.i18n.localize("RNKEXPORTS.Notifications.ExportComplete"));
+      ui.notifications.info(localize("RNKEXPORTS.Notifications.ExportComplete"));
     } catch (err) {
-      console.error("[RNK Exports] Export compendia error:", err);
-      ui.notifications.error(game.i18n.localize("RNKEXPORTS.Notifications.ExportFailed"));
+      console.error(`${MODULE_LABEL} Export compendia error:`, err);
+      ui.notifications.error(localize("RNKEXPORTS.Notifications.ExportFailed"));
     }
   }
 
   async _exportAll() {
-    ui.notifications.info(game.i18n.localize("RNKEXPORTS.Notifications.ExportingAll"));
+    ui.notifications.info(localize("RNKEXPORTS.Notifications.ExportingAll"));
     try {
-      const includeReadableText = game.settings.get("rnk-exports", "includeReadableText");
-      await this._exportChat(this._splitOptions.chat);
-      await this._exportJournals(this._splitOptions.journals);
-      const splitFiles = this._splitOptions.compendia;
-      const { blob, filename } = await exportCompendiumPacks({ splitFiles, includeReadableText });
+      const includeReadableText = game.settings.get(MODULE_ID, "includeReadableText");
+      const selectedPackIds = this._selectedPacks.size ? Array.from(this._selectedPacks) : [];
+      const { blob, filename } = await exportAllData({
+        packIds: selectedPackIds,
+        folderIds: Array.from(this._selectedFolders),
+        splitOptions: this._splitOptions,
+        includeReadableText
+      });
       downloadBlob(blob, filename);
-      ui.notifications.info(game.i18n.localize("RNKEXPORTS.Notifications.ExportComplete"));
+      ui.notifications.info(localize("RNKEXPORTS.Notifications.ExportComplete"));
     } catch (err) {
-      console.error("[RNK Exports] Export all error:", err);
-      ui.notifications.error(game.i18n.localize("RNKEXPORTS.Notifications.ExportFailed"));
+      console.error(`${MODULE_LABEL} Export all error:`, err);
+      ui.notifications.error(localize("RNKEXPORTS.Notifications.ExportFailed"));
     }
   }
 
   async _exportFolder() {
     if (this._selectedFolders.size === 0) {
-      ui.notifications.warn(game.i18n.localize("RNKEXPORTS.Notifications.FolderSelectionRequired"));
+      ui.notifications.warn(localize("RNKEXPORTS.Notifications.FolderSelectionRequired"));
       return;
     }
 
-    ui.notifications.info(game.i18n.localize("RNKEXPORTS.Notifications.ExportingFolder"));
+    ui.notifications.info(localize("RNKEXPORTS.Notifications.ExportingFolder"));
     try {
-      const includeReadableText = game.settings.get("rnk-exports", "includeReadableText");
-      const { blob, filename } = await this._exportGameFolders(Array.from(this._selectedFolders), includeReadableText);
+      const includeReadableText = game.settings.get(MODULE_ID, "includeReadableText");
+      const { blob, filename } = await exportWorldFolders({
+        folderIds: Array.from(this._selectedFolders),
+        includeReadableText
+      });
       downloadBlob(blob, filename);
-      ui.notifications.info(game.i18n.localize("RNKEXPORTS.Notifications.ExportComplete"));
+      ui.notifications.info(localize("RNKEXPORTS.Notifications.ExportComplete"));
     } catch (err) {
-      console.error("[RNK Exports] Export folder error:", err);
-      ui.notifications.error(game.i18n.localize("RNKEXPORTS.Notifications.ExportFailed"));
+      console.error(`${MODULE_LABEL} Export folder error:`, err);
+      ui.notifications.error(localize("RNKEXPORTS.Notifications.ExportFailed"));
     }
   }
 
-  async _exportGameFolders(folderIds, includeReadableText = true) {
-    const { ZipBuilder } = await import("../utils/ZipBuilder.js");
-    const allDocs = [];
-
-    const collectFromFolder = (folderId) => {
-      const folder = game.folders.get(folderId);
-      if (!folder) return;
-      const docs = folder.contents.map(doc => doc.toObject());
-      for (const doc of docs) {
-        allDocs.push({ folder: folder.name, type: folder.type, data: doc });
-      }
-      const children = game.folders.filter(f => f.folder?.id === folderId);
-      for (const child of children) {
-        collectFromFolder(child.id);
-      }
-    };
-
-    for (const id of folderIds) {
-      collectFromFolder(id);
-    }
-
-    const date = new Date().toISOString().replace(/[:.]/g, "-");
-    const worldName = (game.world.name || "world").replace(/[^a-zA-Z0-9-_\.]/g, "_");
-    const rootName = `folder-export-${worldName}-${date}`;
-
-    const zip = new ZipBuilder();
-    zip.addFile(`${rootName}/documents.json`, JSON.stringify(allDocs, null, 2));
-    if (includeReadableText) {
-      const readable = allDocs.map((entry) => ({
-        folder: entry.folder,
-        type: entry.type,
-        name: entry.data?.name || entry.data?.id || "(unknown)",
-        data: entry.data
-      }));
-      zip.addFile(`${rootName}/documents.txt`, JSON.stringify(readable, null, 2));
-    }
-
-    return { blob: zip.build(), filename: `${rootName}.zip` };
-  }
-
-  async _importCompendia() {
+  async _importDocuments() {
     if (!this._importFile) {
-      ui.notifications.warn(game.i18n.localize("RNKEXPORTS.Notifications.NoImportFile"));
+      ui.notifications.warn(localize("RNKEXPORTS.Notifications.NoImportFile"));
       return;
     }
 
-    ui.notifications.info(game.i18n.localize("RNKEXPORTS.Notifications.ImportingCompendia"));
+    ui.notifications.info(localize("RNKEXPORTS.Notifications.ImportingDocuments"));
     try {
-      const raw = await this._readFileAsText(this._importFile);
-      const imported = await importJsonDocuments(raw);
+      const imported = await importExportFile(this._importFile);
       ui.notifications.info(
-        game.i18n.format("RNKEXPORTS.Notifications.ImportComplete", { count: imported.length })
+        format("RNKEXPORTS.Notifications.ImportComplete", { count: imported.length })
       );
       this._renderImportResults(imported);
     } catch (err) {
-      console.error("[RNK Exports] Import error:", err);
-      ui.notifications.error(game.i18n.localize("RNKEXPORTS.Notifications.ImportFailed"));
+      console.error(`${MODULE_LABEL} Import error:`, err);
+      ui.notifications.error(localize("RNKEXPORTS.Notifications.ImportFailed"));
     }
-  }
-
-  _readFileAsText(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsText(file);
-    });
   }
 
   _renderImportResults(imported) {
@@ -320,7 +278,7 @@ export class ExportHubApp extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!container) return;
 
     if (!imported || !imported.length) {
-      container.innerHTML = `<div class="rnk-exports-import-empty">${game.i18n.localize("RNKEXPORTS.Import.NoResults")}</div>`;
+      container.innerHTML = `<div class="rnk-exports-import-empty">${localize("RNKEXPORTS.Import.NoResults")}</div>`;
       return;
     }
 
@@ -328,7 +286,7 @@ export class ExportHubApp extends HandlebarsApplicationMixin(ApplicationV2) {
     list.classList.add("rnk-exports-import-list");
     for (const doc of imported) {
       const li = document.createElement("li");
-      li.textContent = `${doc.type} � ${doc.name || doc.id || "(unknown)"}`;
+      li.textContent = `${doc.documentName || doc.type} — ${doc.name || doc.id || localize("RNKEXPORTS.Import.Unknown")}`;
       list.appendChild(li);
     }
     container.innerHTML = "";
@@ -344,7 +302,7 @@ export class ExportHubApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const packs = [...game.packs].sort((a, b) => a.metadata.label.localeCompare(b.metadata.label));
 
     if (!packs.length) {
-      container.innerHTML = "<p class='rnk-exports-empty'>No compendium packs found</p>";
+      container.innerHTML = `<p class="rnk-exports-empty">${localize("RNKEXPORTS.Empty.NoCompendiumPacks")}</p>`;
       return;
     }
 
@@ -352,21 +310,21 @@ export class ExportHubApp extends HandlebarsApplicationMixin(ApplicationV2) {
     toolbar.classList.add("rnk-exports-pack-toolbar");
     const selectAll = document.createElement("span");
     selectAll.classList.add("rnk-exports-pack-select-link");
-    selectAll.textContent = "All";
+    selectAll.textContent = localize("RNKEXPORTS.Common.All");
     selectAll.addEventListener("click", () => {
       packs.forEach(p => this._selectedPacks.add(p.collection));
       this._renderPackList(html);
     });
     const selectNone = document.createElement("span");
     selectNone.classList.add("rnk-exports-pack-select-link");
-    selectNone.textContent = "None";
+    selectNone.textContent = localize("RNKEXPORTS.Common.None");
     selectNone.addEventListener("click", () => {
       this._selectedPacks.clear();
       this._renderPackList(html);
     });
     const countLabel = document.createElement("span");
     countLabel.classList.add("rnk-exports-pack-count");
-    countLabel.textContent = `${this._selectedPacks.size}/${packs.length} selected`;
+    countLabel.textContent = format("RNKEXPORTS.Packs.SelectedCount", { selected: this._selectedPacks.size, total: packs.length });
     toolbar.appendChild(selectAll);
     toolbar.appendChild(selectNone);
     toolbar.appendChild(countLabel);
@@ -401,7 +359,7 @@ export class ExportHubApp extends HandlebarsApplicationMixin(ApplicationV2) {
           } else {
             this._selectedPacks.delete(pack.collection);
           }
-          countLabel.textContent = `${this._selectedPacks.size}/${packs.length} selected`;
+          countLabel.textContent = format("RNKEXPORTS.Packs.SelectedCount", { selected: this._selectedPacks.size, total: packs.length });
         });
 
         const label = document.createElement("span");
@@ -435,7 +393,7 @@ export class ExportHubApp extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     if (!folderTypes.size) {
-      view.innerHTML = "<p class='rnk-exports-empty'>No folders found in this world</p>";
+      view.innerHTML = `<p class="rnk-exports-empty">${localize("RNKEXPORTS.Empty.NoWorldFolders")}</p>`;
       return;
     }
 
@@ -449,7 +407,7 @@ export class ExportHubApp extends HandlebarsApplicationMixin(ApplicationV2) {
       const toggle = document.createElement("span");
       toggle.classList.add("rnk-exports-folder-expand");
       toggle.textContent = children.length ? "\u2212" : "\u00A0";
-      toggle.style.cursor = children.length ? "pointer" : "default";
+      if (children.length) toggle.classList.add("is-clickable");
 
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
@@ -519,16 +477,16 @@ export class ExportHubApp extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!selectedSpan) return;
 
     if (this._selectedFolders.size === 0) {
-      selectedSpan.textContent = "No folders selected";
+      selectedSpan.textContent = localize("RNKEXPORTS.Folders.NoneSelected");
       return;
     }
 
     const ids = Array.from(this._selectedFolders);
     const names = ids.map(id => game.folders.get(id)?.name || id);
     if (this._selectedFolders.size === 1) {
-      selectedSpan.textContent = `Selected: ${names[0]}`;
+      selectedSpan.textContent = format("RNKEXPORTS.Folders.SingleSelected", { name: names[0] });
     } else {
-      selectedSpan.textContent = `${this._selectedFolders.size} folders selected`;
+      selectedSpan.textContent = format("RNKEXPORTS.Folders.MultiSelected", { count: this._selectedFolders.size });
       selectedSpan.title = names.join("\n");
     }
   }
