@@ -1,9 +1,9 @@
 # RNK™ Exports
 
-**Version**: 1.0.4  
+**Version**: 1.0.5  
 **Module ID**: `rnk-exports`  
 **Release Tier**: Free  
-**Compatibility**: Foundry VTT v13+ (minimum: 13, verified: 13)  
+**Compatibility**: Foundry VTT v13-14 (minimum: 13, verified: 14)  
 **License**: RNK Proprietary License
 
 ## Purpose
@@ -18,7 +18,7 @@ RNK™ Exports is a standalone Foundry VTT export hub for packaging world data i
 - Export selected world-document folders while preserving nested folder paths
 - Restore RNK™ Exports `.json` and `.zip` bundles into world documents
 - Create one combined export bundle from the Export tab
-- Restrict access to GMs through a Foundry VTT v13 `ApplicationV2` interface
+- Restrict access to GMs through a Foundry VTT v13-14 `ApplicationV2` interface
 
 ## Module Structure
 
@@ -93,7 +93,7 @@ rnk-exports/
 
 ## Technical Details
 
-- **Framework**: Foundry VTT v13 `ApplicationV2`
+- **Framework**: Foundry VTT v13-14 `ApplicationV2`
 - **Architecture**: Standalone export hub with separate export, import, and ZIP helper modules
 - **Styling**: Split stylesheet layout to keep tracked files under the RNK 500-line limit
 - **Validation**: `npm test` validates manifest JSON, version parity, protected flag, required files, line caps, blocked wording, and emoji characters

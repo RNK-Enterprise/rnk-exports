@@ -4,6 +4,14 @@ All notable changes to RNK™ Exports are documented here.
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-04-15
+
+### Release Alignment
+
+- Updated the stable manifest URL to the GitHub latest release endpoint.
+- Bumped compatibility verified support from 13 to 14 for v13-14 range.
+- Removed stale release ZIP artifacts from the repository.
+
 ## [1.0.4] - 2026-03-31
 
 ### Release Correction
@@ -64,4 +72,4 @@ All notable changes to RNK™ Exports are documented here.
 ---
 
 **Author**: RNK Enterprise  
-**Last Updated**: March 31, 2026
+**Last Updated**: April 15, 2026

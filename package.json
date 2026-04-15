@@ -1,6 +1,6 @@
 {
   "name": "rnk-exports",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Export and restore Foundry chat, journals, compendia, and selected world folders with RNK™ Exports ZIP bundles.",
   "type": "module",
   "main": "src/main.js",
